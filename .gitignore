@@ -1,0 +1,13 @@
+.svn
+.metadata
+.settings
+.project
+.pydevproject
+.vscode
+.idea
+.xlsx
+.txt
+*.log
+*.pyc
+/**/__pycache__
+/**/.DS_Store
