@@ -3,12 +3,12 @@ from django.http import HttpResponse
 from playlist.models import PlayInfo
 from song.models import SongInfo
 from sing.models import SingInfo
-import json
+from tools import re_response, re_request
 
 
 # 音乐播放
 def play_music(request):
-    reqall = json.loads(request.body)
+    reqall = re_request(request)  # json.loads(request.body.decode('utf-8'))
     tyep = reqall.get('type')
     _id = reqall.get('id')
     data = []
@@ -19,7 +19,7 @@ def play_music(request):
         for _ in SongInfo.objects.filter(song_id__in=query_songs). \
                 values_list('song_id', 'title', 'img', 'author_one__name'):
             # MP3_URL = f'http://music.163.com/song/media/outer/url?id={_[0]}.mp3'
-            mp3_url='http://music.163.com/song/media/outer/url?id='+str(_[0])+'.mp3'
+            mp3_url = 'http://music.163.com/song/media/outer/url?id=' + str(_[0]) + '.mp3'
             data.append({
                 'title': _[1],
                 'pic': _[2],
@@ -43,7 +43,7 @@ def play_music(request):
     if tyep == 'song':  # 说明是具体某歌曲
         obj = SongInfo.objects.filter(song_id=_id). \
             values_list('song_id', 'title', 'img', 'author_one__name')[0]
-       # MP3_URL = f'http://music.163.com/song/media/outer/url?id={obj[0]}.mp3'
+        # MP3_URL = f'http://music.163.com/song/media/outer/url?id={obj[0]}.mp3'
         mp3_url = 'http://music.163.com/song/media/outer/url?id=' + str(obj[0]) + '.mp3'
         data.append({
             'title': obj[1],
@@ -52,12 +52,7 @@ def play_music(request):
             'author': obj[3]
         })
         title = '歌曲:' + obj[1]
-    return HttpResponse(json.dumps({
-        'state': 1,
-        'messgae': '成功',
-        'data': data,
-        'title': title
-    }))
+    return re_response({'data':data,'title':title})
 
 
 # 音乐推荐
@@ -71,13 +66,8 @@ def song_hotrec(request):
             'picUrl': _[2],
             'singer': _[3]
         })
+    return re_response(data)
 
-    return HttpResponse(json.dumps(
-        {'state': 1,
-         'messgae': '成功',
-         'data': data
-         }
-    ))
 
 
 def hello_view(request):

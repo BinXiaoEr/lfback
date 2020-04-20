@@ -1,10 +1,7 @@
-from django.http import HttpResponse
-from playlist.models import PlayInfo
 from sing.models import SingInfo
 from song.models import SongInfo
-import json
 from django.db.models import Q
-
+from tools import re_request,re_response
 
 def sing_hotrec(request):
     data = []
@@ -14,13 +11,7 @@ def sing_hotrec(request):
             'singer': _[1],
             'picUrl': _[2]
         })
-
-    return HttpResponse(json.dumps(
-        {'state': 1,
-         'messgae': '成功',
-         'data': data
-         }
-    ))
+    return re_response(data)
 
 
 def sing_info(request):
@@ -28,7 +19,7 @@ def sing_info(request):
     :param request:
     :return:
     """
-    reqall = json.loads(request.body)
+    reqall = re_request(request)#json.loads(request.body)
     _id = reqall.get('id')
     obj = SingInfo.objects.get(sing_id=_id)
     artist = {
@@ -53,8 +44,4 @@ def sing_info(request):
         'artist': artist,
         'songlist': songlist
     }
-    return HttpResponse(json.dumps({
-        'state': 1,
-        'message': '成功',
-        'data': data
-    }))
+    return re_response(data)

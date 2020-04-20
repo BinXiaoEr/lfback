@@ -1,8 +1,5 @@
-from django.http import HttpResponse
 from playlist.models import PlayInfo
-
-import json
-
+from tools import re_request,re_response
 
 def playlist_hotrec(request):
     """
@@ -18,9 +15,4 @@ def playlist_hotrec(request):
             'picUrl': _[2],
             'playCount': _[3]
         })
-    return HttpResponse(
-        json.dumps({
-            'state': 1,
-            'message': '成功',
-            'data': datas
-        }))
+    return re_response(datas)
