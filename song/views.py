@@ -76,3 +76,6 @@ def song_hotrec(request):
          'data': data
          }
     ))
+
+def hello_view(request):
+    return HttpResponse("hello world")
