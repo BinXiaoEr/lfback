@@ -71,7 +71,6 @@ def song_hotrec(request):
 
 def song_search(request):
     reqall = re_request(request)
-    print(reqall)
     keyword = reqall.get('keyword')
     quryinfo = reqall.get('quryinfo')
     page = quryinfo['page']
