@@ -18,11 +18,12 @@ def play_music(request):
         query_songs = obj.songs.split(',')
         for _ in SongInfo.objects.filter(song_id__in=query_songs). \
                 values_list('song_id', 'title', 'img', 'author_one__name'):
-            MP3_URL = f'http://music.163.com/song/media/outer/url?id={_[0]}.mp3'
+            # MP3_URL = f'http://music.163.com/song/media/outer/url?id={_[0]}.mp3'
+            mp3_url='http://music.163.com/song/media/outer/url?id='+str(_[0])+'.mp3'
             data.append({
                 'title': _[1],
                 'pic': _[2],
-                'url': MP3_URL,
+                'url': mp3_url,
                 'author': _[3]
             })
         title = "歌单:" + obj.title + '的歌曲'
@@ -31,22 +32,23 @@ def play_music(request):
         for _ in SongInfo.objects. \
                 filter(Q(author_one=_id) | Q(author_two=_id) | Q(author_three=_id)). \
                 values_list('song_id', 'title', 'img', 'author_one__name'):
-            MP3_URL = f'http://music.163.com/song/media/outer/url?id={_[0]}.mp3'
+            mp3_url = 'http://music.163.com/song/media/outer/url?id=' + str(_[0]) + '.mp3'
             data.append({
                 'title': _[1],
                 'pic': _[2],
-                'url': MP3_URL,
+                'url': mp3_url,
                 'author': _[3]
             })
         title = "歌手:" + obj.name + '歌曲'
     if tyep == 'song':  # 说明是具体某歌曲
         obj = SongInfo.objects.filter(song_id=_id). \
             values_list('song_id', 'title', 'img', 'author_one__name')[0]
-        MP3_URL = f'http://music.163.com/song/media/outer/url?id={obj[0]}.mp3'
+       # MP3_URL = f'http://music.163.com/song/media/outer/url?id={obj[0]}.mp3'
+        mp3_url = 'http://music.163.com/song/media/outer/url?id=' + str(obj[0]) + '.mp3'
         data.append({
             'title': obj[1],
             'pic': obj[2],
-            'url': MP3_URL,
+            'url': mp3_url,
             'author': obj[3]
         })
         title = '歌曲:' + obj[1]
@@ -62,12 +64,12 @@ def play_music(request):
 def song_hotrec(request):
     data = []
 
-    for _ in SongInfo.objects.all().values_list("song_id","title",'img','author_one__name')[:20]:
+    for _ in SongInfo.objects.all().values_list("song_id", "title", 'img', 'author_one__name')[:20]:
         data.append({
-            'id':_[0],
+            'id': _[0],
             'name': _[1],
-            'picUrl':_[2],
-            'singer':_[3]
+            'picUrl': _[2],
+            'singer': _[3]
         })
 
     return HttpResponse(json.dumps(
@@ -77,5 +79,6 @@ def song_hotrec(request):
          }
     ))
 
+
 def hello_view(request):
-    return HttpResponse("hello world")
+    return HttpResponse("hell world")
