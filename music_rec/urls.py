@@ -21,4 +21,5 @@ urlpatterns = [
     url(r"^playlist/", include('playlist.urls')),
     url(r"^sing/", include('sing.urls')),
     url(r"^song/", include('song.urls')),
+    url(r'^user/',include('user.urls'))
 ]
