@@ -52,7 +52,7 @@ def play_music(request):
             'author': obj[3]
         })
         title = '歌曲:' + obj[1]
-    return re_response({'data':data,'title':title})
+    return re_response({'data': data, 'title': title})
 
 
 # 音乐推荐
@@ -68,6 +68,33 @@ def song_hotrec(request):
         })
     return re_response(data)
 
+
+def song_search(request):
+    reqall = re_request(request)
+    print(reqall)
+    keyword = reqall.get('keyword')
+    quryinfo = reqall.get('quryinfo')
+    page = quryinfo['page']
+    pagesize = quryinfo['pagesize']
+    data = []
+    total=0
+    singers = SingInfo.objects.filter(name__icontains=keyword).values_list('sing_id', flat=True)
+    total += SongInfo.objects.filter(Q(title__icontains=keyword)|Q(author_id__in=list(singers))).count()
+
+    for _ in SongInfo.objects.filter(Q(title__icontains=keyword)|Q(author_id__in=list(singers)))[
+             (page - 1) * pagesize:page * pagesize]:
+        data.append({
+            'id': _.song_id,
+            'title': _.title,
+            'album': _.album_title,
+            'singname': _.author_one.name,
+            'singid': _.author_one.sing_id
+        })
+    # 获取歌手的歌单
+
+
+
+    return re_response({'data': data, 'total': total})
 
 
 def hello_view(request):

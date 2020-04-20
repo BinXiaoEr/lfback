@@ -45,3 +45,17 @@ def sing_info(request):
         'songlist': songlist
     }
     return re_response(data)
+
+
+def hot_sing(request):
+    reqall=re_request(request)
+    page=reqall.get('page')
+    pagesize=reqall.get('pagesize')
+    data=[]
+    for _ in SingInfo.objects.filter(img__isnull=False).values_list('sing_id','img','name')[(page-1)*pagesize:page*pagesize]:
+        data.append({
+            'id':_[0],
+            'picUrl':_[1],
+            'name':_[2]
+        })
+    return re_response(data)
