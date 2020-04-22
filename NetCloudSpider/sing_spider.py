@@ -8,12 +8,7 @@ os.chdir(dir_path)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "music_rec.settings")
 django.setup()
 
-from selenium import webdriver
-import selenium.webdriver.support.ui as ui
-from selenium.webdriver.chrome.options import Options
 from music_rec.settings import CHROME_PATH, SPLIT
-
-from playlist.models import PlayInfo
 from song.models import SongInfo
 from sing.models import SingInfo
 import requests
