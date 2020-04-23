@@ -17,7 +17,3 @@ class SongInfo(models.Model):
     author_two=models.CharField(max_length=10,null=True, blank=True)
     author_three=models.CharField(max_length=10,null=True, blank=True)
 
-
-class SongTag(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField('名称', null=True, max_length=255)

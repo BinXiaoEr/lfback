@@ -11,8 +11,8 @@ django.setup()
 from music_rec.settings import CHROME_PATH, SPLIT
 
 from playlist.models import PlayInfo, PlayListTag
-from song.models import SongInfo, SongTag
-from sing.models import SingInfo
+from song.models import SongInfo
+from sing.models import SingInfo, SingTag
 from django.db.models import Q
 
 local_path = os.path.dirname(os.path.abspath(__file__))
@@ -77,11 +77,31 @@ class Tools:
     def get_collection_music(self):
         for _ in SingInfo.objects.all():
             sing_id = _.sing_id
-            _.colletsize = SongInfo.objects.filter(Q(author_one=sing_id)|Q(author_two=sing_id)|Q(author_three=sing_id)).count()
+            _.colletsize = SongInfo.objects.filter(
+                Q(author_one=sing_id) | Q(author_two=sing_id) | Q(author_three=sing_id)).count()
             print(sing_id)
             _.save()
+
+    def get_sing_tag(self):
+        """
+
+        通过歌单获取 内部歌手的tag类型
+        :return:
+        """
+        for _ in PlayInfo.objects.all():
+            all_songs = _.songs.split(',')
+            tags=_.tag.split(SPLIT)
+            for tag in tags:
+                for author_id in \
+                        SongInfo.objects.filter(song_id__in=all_songs).values_list('author_one'):
+                    author = SingInfo.objects.get(sing_id=author_id[0])
+                    if not SingTag.objects.\
+                            filter(name=tag, sing_id=author).exists():
+                        print(tag,author.name)
+                        SingTag.objects.create(name=tag, sing_id=author)
 
 
 if __name__ == '__main__':
     tools = Tools()
-    tools.get_collection_music()
+    # tools.get_collection_music()
+    tools.get_sing_tag()
