@@ -4,6 +4,11 @@ from django.db.models import Q
 from tools import re_request,re_response
 
 def sing_hotrec(request):
+    """
+    热门歌手
+    :param request:
+    :return:
+    """
     data = []
     for _ in SingInfo.objects.filter(img__isnull=False).values_list('sing_id', 'name', 'img')[:20]:
         data.append({
@@ -22,6 +27,7 @@ def sing_info(request):
     reqall = re_request(request)#json.loads(request.body)
     _id = reqall.get('id')
     obj = SingInfo.objects.get(sing_id=_id)
+    # colletsize=SongInfo.objects.filter(Q(author_one=_id)|Q(author_two=_id)|Q(author_three=_id)).count()
     artist = {
         'name': obj.name,
         'desc': '',

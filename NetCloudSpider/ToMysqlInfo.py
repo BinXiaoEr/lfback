@@ -13,7 +13,7 @@ from music_rec.settings import CHROME_PATH, SPLIT
 from playlist.models import PlayInfo, PlayListTag
 from song.models import SongInfo, SongTag
 from sing.models import SingInfo
-import json
+from django.db.models import Q
 
 local_path = os.path.dirname(os.path.abspath(__file__))
 f = open(local_path + '/data/sing.txt', 'r')
@@ -61,27 +61,26 @@ class Tools:
         for _ in SongInfo.objects.all():
 
             authors = _.author_id
-            if _.author_one ==None or _.author_one =='':
+            if _.author_one == None or _.author_one == '':
                 print(authors)
                 continue
             all_author = authors.split(',')
-            _.author_one =all_author[0]
+            _.author_one = all_author[0]
             if len(all_author) > 1:
                 tag2 = all_author[1]
-                _.author_two=tag2
+                _.author_two = tag2
             if len(all_author) > 2:
                 tag3 = all_author[2]
-                _.author_three=tag3
+                _.author_three = tag3
             _.save()
+
     def get_collection_music(self):
         for _ in SingInfo.objects.all():
-            sing_id=_.sing_id
-            _one=SongInfo.objects.filter(author_one=sing_id).count()
-            _two=SongInfo.objects.filter(author_two=sing_id).count()
-            _three = SongInfo.objects.filter(author_three=sing_id).count()
-            _.colletsize=_one+_three+_two
-            print(sing_id,_.name,_one+_three+_two)
+            sing_id = _.sing_id
+            _.colletsize = SongInfo.objects.filter(Q(author_one=sing_id)|Q(author_two=sing_id)|Q(author_three=sing_id)).count()
+            print(sing_id)
             _.save()
+
 
 if __name__ == '__main__':
     tools = Tools()

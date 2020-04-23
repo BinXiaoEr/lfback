@@ -20,6 +20,11 @@ def playlist_hotrec(request):
 
 
 def playlist_tags(request):
+    """
+    歌单标签获取
+    :param request:
+    :return:
+    """
     reall = re_request(request)
     queryinfo = reall.get('queryinfo')
     page = queryinfo['pagenum']
@@ -36,11 +41,15 @@ def playlist_tags(request):
 
 
 def playlist_ontag(request):
+    """
+    标签下的所有歌单
+    :param request:
+    :return:
+    """
     reall = re_request(request)
     queryinfo=reall.get('queryinfo')
     page=queryinfo['pagenum']
     pagesize=queryinfo['pagesize']
-    print(reall)
     _id = reall.get('id')
     tagname=PlayListTag.objects.get(id=_id).name
     data = []
