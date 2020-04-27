@@ -52,7 +52,7 @@ class SingSpider:
             _.img = sing_info['picUrl']
             songs = infos.get('hotSongs')
 
-            for song_info in songs[:20]:
+            for song_info in songs[:30]:
                 song_id = song_info['id']  # 歌单id
                 if SongInfo.objects.filter(song_id=song_id).exists():
                     continue
@@ -78,7 +78,7 @@ class SingSpider:
                 print(data)
             _.save()
 
-            time.sleep(random.choice(range(2, 5)))
+            # time.sleep(random.choice(range(2, 5)))
 
 
 if __name__ == '__main__':

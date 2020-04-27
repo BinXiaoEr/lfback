@@ -6,7 +6,7 @@ class PlayListTag(models.Model):
     name = models.CharField('名称', null=True, max_length=255)
     nums = models.IntegerField("数量", default=1)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.id
 
     class Meta:
@@ -32,7 +32,7 @@ class PlayInfo(models.Model):
     second_tag = models.IntegerField(default=59)  #
     thrid_tag = models.IntegerField(default=59)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.play_id
 
     class Meta:
@@ -47,7 +47,7 @@ class PlayListSim(models.Model):
                                      verbose_name="相似歌单ID", on_delete=models.DO_NOTHING)
     sim = models.FloatField(blank=True, verbose_name="相似度")
 
-    def __str__(self):
+    def __unicode__(self):
         return self.playlist
 
     class Meta:
