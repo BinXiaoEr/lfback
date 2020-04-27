@@ -10,6 +10,7 @@ from song.models import SongInfo
 
 MAX_HISTORY = 2
 
+
 # 设置用户还可通过电话号码进行登录
 class CustomBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
@@ -22,6 +23,11 @@ class CustomBackend(ModelBackend):
 
 
 def mylogin(request):
+    """
+    用户登录
+    :param request:
+    :return:
+    """
     reqall = re_request(request)
     username = reqall['username']
     password = reqall['password']
@@ -36,6 +42,11 @@ def mylogin(request):
 
 
 def mylogout(request):
+    """
+    用户注销
+    :param request:
+    :return:
+    """
     reqall = re_request(request)
     username = reqall['username']
     userid = reqall['useid']
@@ -46,6 +57,11 @@ def mylogout(request):
 
 
 def myregister(request):
+    """
+    用户注册
+    :param request:
+    :return:
+    """
     reqall = re_request(request)
     username = reqall['username']
     password = reqall['password']
@@ -62,6 +78,11 @@ def myregister(request):
 
 
 def add_history(request):
+    """
+    添加历史记录
+    :param request:
+    :return:
+    """
     reqall = re_request(request)
     uid = int(reqall['userid'])  # userid
     tyep = reqall['type']  # 播放的是歌单还是什么
@@ -101,3 +122,28 @@ def add_history(request):
         user_history.__dict__.update(**model_data)
         user_history.save()
     return re_response({'state': 1})
+
+
+def get_recommend(request):
+    """
+    获取用户推荐
+    :param request:
+    :return:
+    """
+    reall = re_request(request)
+    userid = int(reall['userid'])  # 用户id
+    histrorys = UserHistory.objects.filter(userid__id=userid). \
+        order_by('add_time').values_list('song_id', 'sing_id', 'playlist_id')
+    song_ids, sing_ids, plalist_ids = [], [], []
+
+    for _ in histrorys:
+        if _[0] not in song_ids:
+            song_ids.append(_[0])
+        if _[1] not in sing_ids:
+            sing_ids.append(_[1])
+        if _[2] not in plalist_ids:
+            plalist_ids.append(_[2])
+
+    return re_response({'state': 1})
+
+

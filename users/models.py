@@ -11,11 +11,16 @@ class User(AbstractUser):
 
     class Meta(AbstractUser.Meta):
         app_label = "users"
+        db_table = "UsersInfo"
+        verbose_name_plural = "用户信息"
 
 
 class UserHistory(models.Model):
-    userid = models.ForeignKey(User, to_field='id')
+    userid = models.ForeignKey(User, to_field='id',on_delete=models.DO_NOTHING)
     song_id = models.TextField("歌曲id", blank=True, null=True)
     sing_id = models.TextField("歌手id", blank=True, null=True)
     playlist_id = models.TextField("歌单id", blank=True, null=True)  # 可能会存在没有
     add_time = models.DateTimeField(auto_now=True)  # 设置日期添加时限
+    # class Meta:
+    #     db_table = "UserHistory"
+    #     verbose_name_plural = "用户记录"
