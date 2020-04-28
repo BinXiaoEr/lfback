@@ -108,6 +108,6 @@ def singsim_to_mysql():
 
 
 if __name__ == '__main__':
-    sing = SingSimClass()
-    sing.transform()
-   # singsim_to_mysql()
+    #sing = SingSimClass()
+    #sing.transform()
+    singsim_to_mysql()

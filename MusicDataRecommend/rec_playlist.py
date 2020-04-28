@@ -236,25 +236,25 @@ def playlistsim_to_mysql():
 
     with open(dir_data_path + 'playlist_sim.txt', 'r') as f:
         playlistinfo = {}
-    for line in f.readlines():
-        line = line.strip()
-        if line == '':
-            continue
-        s1 = line.split(',')[0]
-        s2 = line.split(',')[1]
-        sim = line.split(',')[2]
-        print(s1, s2, sim)
-        playlist_instance1 = playlistinfo.get(s1, False)
-        playlist_instance2 = playlistinfo.get(s2, False)
-        if not playlist_instance1:
-            playlist_instance1 = PlayInfo.objects.get(play_id=s1)
-            playlistinfo[s1] = playlist_instance1
-        if not playlist_instance2:
-            playlist_instance2 = PlayInfo.objects.get(play_id=s2)
-            playlistinfo[s2] = playlist_instance2
+        for line in f.readlines():
+            line = line.strip()
+            if line == '':
+                continue
+            s1 = line.split(',')[0]
+            s2 = line.split(',')[1]
+            sim = line.split(',')[2]
+            print(s1, s2, sim)
+            playlist_instance1 = playlistinfo.get(s1, False)
+            playlist_instance2 = playlistinfo.get(s2, False)
+            if not playlist_instance1:
+                playlist_instance1 = PlayInfo.objects.get(play_id=s1)
+                playlistinfo[s1] = playlist_instance1
+            if not playlist_instance2:
+                playlist_instance2 = PlayInfo.objects.get(play_id=s2)
+                playlistinfo[s2] = playlist_instance2
 
-        PlayListSim.objects.create(playlist=playlist_instance1, sim_playlist=playlist_instance2,
-                                   sim=sim)
+            PlayListSim.objects.create(playlist=playlist_instance1, sim_playlist=playlist_instance2,
+                                       sim=sim)
 
 
 if __name__ == '__main__':

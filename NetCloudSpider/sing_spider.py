@@ -21,14 +21,14 @@ f = open(local_path + '/data/sing.txt', 'r')
 
 
 class SingSpider:
-    def __init__(self):
-
-        self.all_authors = []
-        for line in f.readlines():
-            line = line.strip('\n')
-            if line == '' or line in self.all_authors:
-                continue
-            self.all_authors.append(line)
+    # def __init__(self):
+    #
+    #     self.all_authors = []
+    #     for line in f.readlines():
+    #         line = line.strip('\n')
+    #         if line == '' or line in self.all_authors:
+    #             continue
+    #         self.all_authors.append(line)
 
     def author_from_txt(self):
         for _ in self.all_authors:

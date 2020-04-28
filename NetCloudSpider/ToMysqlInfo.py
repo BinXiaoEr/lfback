@@ -59,7 +59,6 @@ class Tools:
 
     def get_song_sing(self):
         for _ in SongInfo.objects.all():
-
             authors = _.author_id
             if _.author_one == None or _.author_one == '':
                 print(authors)
@@ -84,21 +83,31 @@ class Tools:
 
     def get_sing_tag(self):
         """
-
-        通过歌单获取 内部歌手的tag类型
+        通过歌单获取 歌手的tag
         :return:
         """
+        author_taglist = []
+        bulk_insert = []
+        i = 0
         for _ in PlayInfo.objects.all():
             all_songs = _.songs.split(',')
-            tags=_.tag.split(SPLIT)
+            tags = _.tag.split(SPLIT)
             for tag in tags:
-                for author_id in \
-                        SongInfo.objects.filter(song_id__in=all_songs).values_list('author_one'):
+                for author_id in SongInfo.objects.filter(song_id__in=all_songs).values_list(
+                        'author_one'):
                     author = SingInfo.objects.get(sing_id=author_id[0])
-                    if not SingTag.objects.\
-                            filter(name=tag, sing_id=author).exists():
-                        print(tag,author.name)
-                        SingTag.objects.create(name=tag, sing_id=author)
+                    cmb_author = str(author_id) + tag
+                    if cmb_author not in author_taglist:
+                        bulk_insert.append(SingTag(name=tag, sing_id=author))
+                        print(author.name,tag)
+                        author_taglist.append(cmb_author)
+                        i += 1
+            if i >= 1000:
+                SingTag.objects.bulk_create(bulk_insert)
+                i = 0
+                bulk_insert.clear()
+        if bulk_insert:
+            SingTag.objects.bulk_create(bulk_insert)
 
 
 if __name__ == '__main__':
