@@ -1,7 +1,8 @@
 from sing.models import SingInfo
 from song.models import SongInfo
 from django.db.models import Q
-from tools import re_request,re_response
+from tools import re_request, re_response
+
 
 def sing_hotrec(request):
     """
@@ -10,7 +11,8 @@ def sing_hotrec(request):
     :return:
     """
     data = []
-    for _ in SingInfo.objects.filter(img__isnull=False).values_list('sing_id', 'name', 'img')[:20]:
+    for _ in SingInfo.objects.filter(img__isnull=False). \
+                     values_list('sing_id', 'name', 'img').order_by('-colletsize')[2:22]:
         data.append({
             'id': _[0],
             'singer': _[1],
@@ -24,10 +26,9 @@ def sing_info(request):
     :param request:
     :return:
     """
-    reqall = re_request(request)#json.loads(request.body)
+    reqall = re_request(request)
     _id = reqall.get('id')
     obj = SingInfo.objects.get(sing_id=_id)
-    # colletsize=SongInfo.objects.filter(Q(author_one=_id)|Q(author_two=_id)|Q(author_three=_id)).count()
     artist = {
         'name': obj.name,
         'desc': '',
@@ -39,7 +40,7 @@ def sing_info(request):
     }
 
     songlist = []
-    for _ in SongInfo.objects.filter(Q(author_one=_id)|Q(author_two=_id)|Q(author_three=_id)).\
+    for _ in SongInfo.objects.filter(Q(author_one=_id) | Q(author_two=_id) | Q(author_three=_id)). \
             values_list('song_id', 'title', 'album_title'):
         songlist.append({
             'id': _[0],
@@ -54,14 +55,16 @@ def sing_info(request):
 
 
 def hot_sing(request):
-    reqall=re_request(request)
-    page=reqall.get('page')
-    pagesize=reqall.get('pagesize')
-    data=[]
-    for _ in SingInfo.objects.filter(img__isnull=False).values_list('sing_id','img','name')[(page-1)*pagesize:page*pagesize]:
+    reqall = re_request(request)
+    page = reqall.get('page')
+    pagesize = reqall.get('pagesize')
+    data = []
+    for _ in SingInfo.objects.filter(img__isnull=False). \
+                     values_list('sing_id', 'img', 'name'). \
+                     order_by('-colletsize')[(page - 1) * pagesize:page * pagesize]:
         data.append({
-            'id':_[0],
-            'picUrl':_[1],
-            'name':_[2]
+            'id': _[0],
+            'picUrl': _[1],
+            'name': _[2]
         })
     return re_response(data)

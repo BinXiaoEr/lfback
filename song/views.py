@@ -5,7 +5,6 @@ from song.models import SongInfo
 from sing.models import SingInfo
 from tools import re_response, re_request
 
-
 # 音乐播放
 def play_music(request):
     reqall = re_request(request)  # json.loads(request.body.decode('utf-8'))
@@ -55,11 +54,14 @@ def play_music(request):
     return re_response({'data': data, 'title': title})
 
 
-# 音乐推荐
+# 热门音乐 通过歌单的前多少播放量获取音乐
 def song_hotrec(request):
     data = []
-
-    for _ in SongInfo.objects.all().values_list("song_id", "title", 'img', 'author_one__name')[:20]:
+    songids=[]
+    for _ in PlayInfo.objects.all().values_list("songs").order_by('-amount')[:20]:
+        for song_id in _[0].split(','):
+            songids.append(song_id)
+    for _ in SongInfo.objects.filter(song_id__in=songids).values_list("song_id", "title", 'img', 'author_one__name')[:27]:
         data.append({
             'id': _[0],
             'name': _[1],
@@ -76,11 +78,12 @@ def song_search(request):
     page = quryinfo['page']
     pagesize = quryinfo['pagesize']
     data = []
-    total=0
+    total = 0
     singers = SingInfo.objects.filter(name__icontains=keyword).values_list('sing_id', flat=True)
-    total += SongInfo.objects.filter(Q(title__icontains=keyword)|Q(author_id__in=list(singers))).count()
+    total += SongInfo.objects.filter(
+        Q(title__icontains=keyword) | Q(author_id__in=list(singers))).count()
 
-    for _ in SongInfo.objects.filter(Q(title__icontains=keyword)|Q(author_id__in=list(singers)))[
+    for _ in SongInfo.objects.filter(Q(title__icontains=keyword) | Q(author_id__in=list(singers)))[
              (page - 1) * pagesize:page * pagesize]:
         data.append({
             'id': _.song_id,
@@ -90,8 +93,6 @@ def song_search(request):
             'singid': _.author_one.sing_id
         })
     # 获取歌手的歌单
-
-
 
     return re_response({'data': data, 'total': total})
 

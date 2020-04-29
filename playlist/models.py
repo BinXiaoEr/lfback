@@ -25,7 +25,8 @@ class PlayInfo(models.Model):
     collection = models.CharField("收藏量", max_length=255, null=True, blank=True)
     forward = models.CharField("分享量", max_length=255, null=True, blank=True)
     comment = models.CharField("评论量", max_length=255, null=True, blank=True)
-    amount = models.CharField("播放量", max_length=255, null=True, blank=True)
+    # amount = models.CharField("播放量", max_length=255, null=True, blank=True)
+    amount = models.IntegerField("播放量",default=0)
     songs = models.TextField("歌单歌曲", null=True, blank=True)
     first_tag = models.ForeignKey(PlayListTag, to_field='id', on_delete=models.DO_NOTHING)  # 主要tag
     # first_tag = models.IntegerField(default=59)

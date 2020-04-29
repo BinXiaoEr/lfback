@@ -7,8 +7,11 @@ from django.db.models import Q
 
 from users.models import User, UserHistory
 from song.models import SongInfo
-
-MAX_HISTORY = 2
+from sing.models import SingInfo, SingSim
+from playlist.models import PlayInfo, PlayListSim
+import random
+# 可以记录用户最大的历史数目
+MAX_HISTORY = 20
 
 
 # 设置用户还可通过电话号码进行登录
@@ -112,7 +115,10 @@ def add_history(request):
     # 对用户记录
     if UserHistory.objects.filter(**model_data).exists():
         # 如果播放的是同一个音乐 则要更新时间
-        UserHistory.objects.update(**model_data)
+        _=UserHistory.objects.get(**model_data)
+        for k,v in model_data.items():
+            setattr(_,k,v)
+        _.save()
     elif UserHistory.objects.filter(userid=user_obj).count() < MAX_HISTORY:
         # 如果当前用户历史播放记录比设定值小 则直接插入新的数据
         UserHistory.objects.create(**model_data)
@@ -144,6 +150,71 @@ def get_recommend(request):
         if _[2] not in plalist_ids:
             plalist_ids.append(_[2])
 
-    return re_response({'state': 1})
+    singlist, sim_sings = _sing_rec(sing_ids)
+    playlist, sim_playlist = _playlist_rec(plalist_ids)
+    songlist = _song_rec(sim_playlist,sim_sings)
+
+    # 用户历史记录获取
+    userhistory=[]
+    for _ in SongInfo.objects.filter(song_id__in=song_ids).values_list("song_id", "title", 'img', 'author_one__name'):
+        userhistory.append({
+            'id': _[0],
+            'name': _[1],
+            'picUrl': _[2],
+            'singer': _[3]
+        })
+    return re_response({'singlist': singlist, 'playlist': playlist,'songlist':songlist,'userhistory':userhistory})
 
 
+def _sing_rec(sing_ids):
+    """
+    通过歌手id获取推荐
+    :param sing_ids:
+    :return:
+    """
+    data = []
+    sim_sings = SingSim.objects.filter(sing_id__in=sing_ids). \
+        values_list("sim_sing__sing_id", flat=True).distinct().order_by('-sim')
+
+    for _ in SingInfo.objects.filter(sing_id__in=sim_sings). \
+                     values_list('sing_id', 'name', 'img').order_by('-colletsize')[:20]:
+        data.append({
+            'id': _[0],
+            'singer': _[1],
+            'picUrl': _[2]
+        })
+    return data, list(sim_sings)
+
+
+def _playlist_rec(playlist_ids):
+    """
+    :param playlist_ids:
+    :return:
+    """
+    sim_playlist = PlayListSim.objects.filter(playlist__play_id__in=playlist_ids). \
+        values_list("sim_playlist__play_id", flat=True).distinct().order_by('-sim')
+    datas = []
+    for _ in PlayInfo.objects.filter(play_id__in=sim_playlist). \
+                     values_list('play_id', 'title', 'img', 'amount').order_by('-amount')[:20]:
+        datas.append({
+            'id': _[0],
+            'name': _[1],
+            'picUrl': _[2],
+            'playCount': _[3]
+        })
+    return datas, list(sim_playlist)
+
+
+def _song_rec(sim_playlist, sim_sing):
+    data = []
+    for _ in SongInfo.objects.filter(
+            Q(play_id__in=sim_playlist) | Q(author_one__sing_id__in=sim_sing)). \
+                     values_list("song_id", "title", 'img', 'author_one__name')[:100]:
+        data.append({
+            'id': _[0],
+            'name': _[1],
+            'picUrl': _[2],
+            'singer': _[3]
+        })
+    random.shuffle(data)
+    return data[:54]

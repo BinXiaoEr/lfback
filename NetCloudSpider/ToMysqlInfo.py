@@ -20,6 +20,11 @@ f = open(local_path + '/data/sing.txt', 'r')
 
 
 class Tools:
+    def zero_tag_num(self):
+        for _ in PlayListTag.objects.all():
+            _.nums = 0
+            _.save()
+        print("已经全部清空")
 
     def get_tas(self):
         """
@@ -27,15 +32,17 @@ class Tools:
         :return: 
         """
         all_tags = {}
-        for _ in PlayInfo.objects.all().values_list('tag', flat=True):
-            if _ == '' or _ is None:
-                continue
-            for _tag in _.split(SPLIT):
+        for _ in PlayInfo.objects.all():
+            tags = _.tag
+            if tags == '' or tags is None:
+                _.tag = '其他'
+                tags = "其他"
+            _.save()
+            for _tag in tags.split(SPLIT):
                 all_tags.setdefault(_tag, 0)
                 all_tags[_tag] += 1
         for k, v in all_tags.items():
             PlayListTag.objects.create(name=k, nums=v)
-        # print(all_tags)
 
     def get_playlist_tag(self):
         """
@@ -48,6 +55,7 @@ class Tools:
                 continue
             tag_list = tags.split(SPLIT)
             tag1 = tag_list[0]
+            print(tag_list)
             _.first_tag = PlayListTag.objects.get(name=tag1)
             if len(tag_list) > 1:
                 tag2 = tag_list[1]
@@ -74,11 +82,12 @@ class Tools:
             _.save()
 
     def get_collection_music(self):
+
         for _ in SingInfo.objects.all():
             sing_id = _.sing_id
             _.colletsize = SongInfo.objects.filter(
                 Q(author_one=sing_id) | Q(author_two=sing_id) | Q(author_three=sing_id)).count()
-            print(sing_id)
+            print(sing_id, _.name, _.colletsize)
             _.save()
 
     def get_sing_tag(self):
@@ -99,7 +108,7 @@ class Tools:
                     cmb_author = str(author_id) + tag
                     if cmb_author not in author_taglist:
                         bulk_insert.append(SingTag(name=tag, sing_id=author))
-                        print(author.name,tag)
+                        print(author.name, tag)
                         author_taglist.append(cmb_author)
                         i += 1
             if i >= 1000:
@@ -112,5 +121,8 @@ class Tools:
 
 if __name__ == '__main__':
     tools = Tools()
+   # tools.zero_tag_num()
+    #tools.get_tas()
+    tools.get_playlist_tag()
     # tools.get_collection_music()
-    tools.get_sing_tag()
+    # tools.get_sing_tag()

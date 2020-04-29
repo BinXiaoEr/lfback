@@ -260,6 +260,6 @@ def playlistsim_to_mysql():
 if __name__ == '__main__':
     # recplay = RecPlayList()
     # recplay._data_from_mysql()
-    # playsim = Playlistsim()
-    # playsim.transform()
+    #playsim = Playlistsim()
+    #playsim.transform()
     playlistsim_to_mysql()
